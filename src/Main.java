@@ -40,7 +40,7 @@ public class Main {
 
         System.out.println(t1);
 
-        System.out.println(j3.getEdad());
+        System.out.println(j1.getEdad());
 
     }
 }
