@@ -1,3 +1,5 @@
+package models;
+
 public class Persona {
     public String name;
     private String country ;
@@ -14,7 +16,7 @@ public class Persona {
 
     @Override
     public String toString() {
-        return "Persona{" +
+        return "models.Persona{" +
                 "name='" + name + '\'' +
                 ", id='" + id + '\'' +
                 ", is_alive=" + is_alive +

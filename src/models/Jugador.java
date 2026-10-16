@@ -1,3 +1,5 @@
+package models;
+
 import java.time.LocalDate;
 import java.time.Period;
 
@@ -22,7 +24,7 @@ public class Jugador extends Persona {
 
     @Override
     public String toString() {
-        return "Jugador{" +
+        return "models.Jugador{" +
                 "dorsal=" + dorsal +
                 "} "
                 + super.toString();
