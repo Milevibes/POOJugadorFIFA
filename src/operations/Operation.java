@@ -60,9 +60,10 @@ public class Operation {
                temp_player.name= data_readed[0];
                temp_player.dorsal = Integer.parseInt(data_readed[1]);
                temp_player.is_alive = Boolean.parseBoolean(data_readed[3]);
-               if (temp_player.name == name)
+
+               if (temp_player.name.equals(name))
                {
-                   //TODO review and fix the decision
+
                    System.out.println(playerReader);
                    //playerReader = null;
                }
@@ -76,6 +77,7 @@ public class Operation {
             System.out.println(e.getMessage());
         }
 
+        //TODO adicionar ID para los registros de jugadores
 
 
     }
