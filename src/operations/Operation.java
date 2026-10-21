@@ -10,7 +10,7 @@ import java.util.Locale;
 
 public class Operation {
     public static void savePlayer(Jugador jugadorToSave)
-{
+    {
     try{
         FileWriter escribir = new FileWriter("players.csv", true);
 
