@@ -159,6 +159,24 @@ public class Operation {
         return id;
     }
 
+    //Operaciones con Equipos
+    public static void createTeam(String teamName, String tecnicoName) {
+        int id = Equipo.generateTeamId();
+
+        // Estructura simple en CSV: ID, NombreEquipo, NombreTecnico
+        String teamData = id + "," + teamName + "," + tecnicoName + "\n";
+
+        File file = new File("teams.csv");
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
+            writer.write(teamData);
+            System.out.println("¡Equipo registrado con éxito! ID asignado: " + id);
+        } catch (IOException e) {
+            System.out.println("Error al guardar el equipo: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 
 
 

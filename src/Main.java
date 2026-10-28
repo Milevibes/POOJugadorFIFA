@@ -23,9 +23,12 @@ public class Main {
             System.out.println("1. Crear Jugador");
             System.out.println("2. Buscar Jugador");
             System.out.println("3. Mostrar jugadores");
+            //TODO actualizar y borrar
             System.out.println("4. Actualizar Jugador");
             System.out.println("5. Borrar Jugador");
-            //TODO actualizar y borrar
+            //Menú Equipos
+            System.out.println("6. Crear Equipo");
+            System.out.println("7. Actualizar Equipo");
             System.out.println("0. Salir");
             System.out.println("******************** ");
 
@@ -46,6 +49,12 @@ public class Main {
                     break;
                 case 5:
                     deletePlayer();
+                    break;
+                case 6:
+                    newTeam();
+                    break;
+                case 7:
+                    updateTeam();
                     break;
                 case 0:
                     System.out.println("Nos vemos");
@@ -111,5 +120,21 @@ public class Main {
         System.out.println("Proceso de eliminación preparado.");
     }
 
+    public static void newTeam() {
+        Scanner leer = new Scanner(System.in);
+        System.out.println("Ingrese el nombre del equipo:");
+        String name_team = leer.nextLine();
+
+        System.out.println("Ingrese el nombre del técnico del equipo:");
+        String name_tecnico = leer.nextLine();
+
+        Operation.createTeam(name_team, name_tecnico);
+    }
+
+    public static void updateTeam() {
+        Scanner Leer = new Scanner(System.in);
+        System.out.println("Ingrese el nombre del equipo que desea actualizar:");
+        String oldName = leer.nextLine();
+        }
 
 }
