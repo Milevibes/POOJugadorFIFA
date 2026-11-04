@@ -3,70 +3,82 @@ import models.Jugador;
 import java.time.LocalDate;
 import java.util.Scanner;
 import operations.Operation;
+import operations.OperationEquipo;
 
 import static operations.Operation.*;
 
 public class Main {
     public static void main(String[] args) {
-
-        //models.Jugador newPlayer = new models.Jugador("Pele", LocalDate.of(1940, 10,23));
-        //newPlayer.is_alive = false;
-        //newPlayer.dorsal=10;
-        //TODO crear menu para usar y operar las acciones de los jugadores
-
         Scanner leer = new Scanner(System.in);
+        int opcionPrincipal;
 
-
-        int opcion;
         do {
-            System.out.println("\n *********** CRUD FIFAS *********** ");
-            System.out.println("1. Crear Jugador");
-            System.out.println("2. Buscar Jugador");
-            System.out.println("3. Mostrar jugadores");
-            //TODO actualizar y borrar
-            System.out.println("4. Actualizar Jugador");
-            System.out.println("5. Borrar Jugador");
-            //Menú Equipos
-            System.out.println("6. Crear Equipo");
-            System.out.println("7. Actualizar Equipo");
+            System.out.println("\n********MENÚ PRINCIPAL FIFA*******");
+            System.out.println("1. Menú Jugadores");
+            System.out.println("2. Menú Equipos");
             System.out.println("0. Salir");
-            System.out.println("******************** ");
+            System.out.print("Seleccione una opción: ");
+            opcionPrincipal = leer.nextInt();
 
-            opcion = leer.nextInt();
-
-            switch (opcion) {
+            switch (opcionPrincipal) {
                 case 1:
-                    newPlayer();
-                    break;
+                    menuJugadores(leer); break;
                 case 2:
-                    findPlayer();
-                    break;
-                case 3:
-                    showAllPlayers();
-                    break;
-                case 4:
-                    updatePlayer();
-                    break;
-                case 5:
-                    deletePlayer();
-                    break;
-                case 6:
-                    newTeam();
-                    break;
-                case 7:
-                    updateTeam();
-                    break;
+                    menuEquipos(leer); break;
                 case 0:
-                    System.out.println("Nos vemos");
+                    System.out.println("Hasta luego :)");
                     break;
                 default:
-                    System.out.println("Opción invalida");
-
-
+                    System.out.println("Opción inválida.");
             }
-        }
-        while (opcion!=0);
+        } while (opcionPrincipal != 0);
+    }
+    public static void menuJugadores(Scanner leer) {
+        int opcion;
+        do {
+            System.out.println("\n*****MENÚ DE JUGADORES*****");
+            System.out.println("1. Crear Jugador");
+            System.out.println("2. Buscar Jugador");
+            System.out.println("3. Mostrar todos los Jugadores");
+            System.out.println("4. Actualizar Jugador");
+            System.out.println("5. Borrar Jugador");
+            System.out.println("0. Volver al Menú Principal");
+            System.out.print("Seleccione una opción: ");
+            opcion = leer.nextInt();
+            leer.nextLine();
 
+            switch (opcion) {
+                case 1: newPlayer(); break;
+                case 2: findPlayer(); break;
+                case 3: showAllPlayers(); break;
+                case 4: updatePlayer(); break;
+                case 5: deletePlayer(); break;
+                case 0: break;
+                default: System.out.println("Opción inválida.");
+            }
+        } while (opcion != 0);
+    }
+
+    public static void menuEquipos(Scanner leer) {
+        int opcion;
+        do {
+            System.out.println("\n*****MENÚ DE EQUIPOS*****");
+            System.out.println("1. Crear Equipo");
+            System.out.println("2. Listar Equipos");
+            System.out.println("3. Actualizar Equipo");
+            System.out.println("0. Volver al Menú Principal");
+            System.out.print("Seleccione una opción: ");
+            opcion = leer.nextInt();
+            leer.nextLine();
+
+            switch (opcion) {
+                case 1: newTeam(); break;
+                case 2: OperationEquipo.readTeams(); break;
+                case 3: updateTeam(); break;
+                case 0: break;
+                default: System.out.println("Opción inválida.");
+            }
+        } while (opcion != 0);
     }
 
     public static void newPlayer() {
@@ -75,10 +87,13 @@ public class Main {
         String name_player = leer.nextLine();
         System.out.println("Ingrese año de nacimiento");
         int year = leer.nextInt();
+        leer.nextLine();
         System.out.println("Ingrese mes de naciemiento");
         int month = leer.nextInt();
+        leer.nextLine();
         System.out.println("Ingrese día de nacimiento");
         int day = leer.nextInt();
+        leer.nextLine();
         savePlayer(new Jugador(name_player, LocalDate.of(year, month, day)));
     }
 
@@ -103,10 +118,13 @@ public class Main {
 
         System.out.println("Ingrese el nuevo año de nacimiento:");
         int year = leer.nextInt();
+        leer.nextLine();
         System.out.println("Ingrese el nuevo mes de nacimiento:");
         int month = leer.nextInt();
+        leer.nextLine();
         System.out.println("Ingrese el nuevo día de nacimiento:");
         int day = leer.nextInt();
+        leer.nextLine();
 
         Operation.updatePlayer(oldName, newName, year, month, day);
         System.out.println("Proceso de actualización preparado.");
@@ -128,11 +146,24 @@ public class Main {
         System.out.println("Ingrese el nombre del técnico del equipo:");
         String name_tecnico = leer.nextLine();
 
-        Operation.createTeam(name_team, name_tecnico);
+        System.out.println("Ingrese el club del técnico:");
+        String club_tecnico = leer.nextLine();
+
+        System.out.println("¿Cuántos jugadores desea agregar a la plantilla inicial?");
+        int totalJugadores = leer.nextInt();
+        leer.nextLine();
+
+        String[] jugadoresEquipo = new String[totalJugadores];
+        for (int i = 0; i < totalJugadores; i++) {
+            System.out.println("Ingrese el nombre o ID del jugador " + (i + 1) + ":");
+            jugadoresEquipo[i] = leer.nextLine();
+
+            OperationEquipo.saveTeam(name_team, name_tecnico, club_tecnico, jugadoresEquipo);
+        }
     }
 
     public static void updateTeam() {
-        Scanner Leer = new Scanner(System.in);
+        Scanner leer = new Scanner(System.in);
         System.out.println("Ingrese el nombre del equipo que desea actualizar:");
         String oldName = leer.nextLine();
         }

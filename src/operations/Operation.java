@@ -1,5 +1,6 @@
 package operations;
 
+import models.Equipo;
 import models.Jugador;
 
 import models.Jugador;
@@ -10,16 +11,15 @@ import java.util.Locale;
 public class Operation {
     public static void savePlayer(Jugador jugadorToSave) {
         try {
-            FileWriter escribir = new FileWriter("players.csv", true);
+            File archivo = new File("players.csv");
+            FileWriter escribir = new FileWriter(archivo, true);
 
-            //escribir.write(jugadorToSave.playerToCSV());
-            escribir.write(jugadorToSave.playerToCSV());
-            escribir.write("\n");
+            escribir.write(jugadorToSave.playerToCSV() + "\n");
             escribir.close();
             System.out.println("Player Saved");
 
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Error al guardar: " + e.getMessage());
         }
     }
 
