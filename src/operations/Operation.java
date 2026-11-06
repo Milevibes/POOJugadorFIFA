@@ -6,6 +6,8 @@ import models.Jugador;
 import models.Jugador;
 import java.io.*;
 import java.io.IOException;
+import java.nio.file.StandardCopyOption;
+import java.sql.SQLOutput;
 import java.util.Locale;
 
 public class Operation {
@@ -46,25 +48,20 @@ public class Operation {
             FileReader lector = new FileReader("players.csv");
             BufferedReader buffer = new BufferedReader(lector);
             String playerReader;
+            boolean encontrado = false;
 
             while ((playerReader = buffer.readLine()) != null) {
-
                 String[] data_readed = playerReader.split(",");
-                Jugador temp_player = new Jugador();
-                temp_player.name = data_readed[0];
-                temp_player.dorsal = Integer.parseInt(data_readed[1]);
-                temp_player.is_alive = Boolean.parseBoolean(data_readed[3]);
-
-                if (temp_player.name.equals(name)) {
-
+                if (data_readed.length > 0 && data_readed[0].trim().equalsIgnoreCase(name.trim())){
                     System.out.println(playerReader);
-                    //playerReader = null;
+                    encontrado = true;
                 }
 
             }
-
-
             buffer.close();
+            if (!encontrado){
+                System.out.println("No se encontró el jugador con ese nombre");
+            }
             System.out.println("All players have been read");
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -75,70 +72,86 @@ public class Operation {
         java.io.File inputFile = new java.io.File("players.csv");
         java.io.File tempFile = new java.io.File("players_temp.csv");
 
+        boolean updated = false;
+
         try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(inputFile));
              java.io.PrintWriter writer = new java.io.PrintWriter(new java.io.FileWriter(tempFile))) {
 
             String currentLine;
-            boolean updated = false;
 
             while ((currentLine = reader.readLine()) != null) {
                 String[] data = currentLine.split(",");
-                if (data.length > 0 && data[0].equals(oldName)) {
+                if (data.length > 0 && data[0].trim().equalsIgnoreCase(oldName.trim())) {
+                    java.time.LocalDate fechaNacimiento = java.time.LocalDate.of(year, month, day);
+                    int edadCalculada = java.time.Period.between(fechaNacimiento, java.time.LocalDate.now()).getYears();
                     String dorsal = data.length > 1 ? data[1] : "0";
-                    String isAlive = data.length > 3 ? data[3] : "true";
+                    String isAlive = data.length > 0 ? data[data.length-1].trim() : "true";
 
-                    writer.println(newName + "," + dorsal + "," + java.time.LocalDate.of(year, month, day) + "," + isAlive);
+                    writer.println(newName + "," + dorsal + "," + edadCalculada + "," + isAlive);
                     updated = true;
                 } else {
                     writer.println(currentLine);
                 }
             }
+            reader.close();
+            writer.close();
+        }
+        catch (Exception e) {
+            System.out.println("Error al procesar el archivo: " + e.getMessage());
+            return;
+        }
 
             if (updated) {
-                System.out.println("Jugador actualizado con éxito en el archivo.");
+                try {
+                    if (inputFile.exists()) {
+                        inputFile.delete();
+                    }
+                    java.nio.file.Files.move(tempFile.toPath(), inputFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                    System.out.println("Jugador actualizado con éxito en el archivo.");
+                } catch (Exception e) {
+                    System.out.println("Error al guardar los cambios: " + e.getMessage());
+                }
             } else {
-                System.out.println("No se encontró el jugador con ese nombre.");
+                    tempFile.delete();
+                    System.out.println("No se encontró el jugador con ese nombre.");
             }
-
-        } catch (Exception e) {
-            System.out.println("Error al actualizar: " + e.getMessage());
         }
-        if (inputFile.delete()) {
-            tempFile.renameTo(inputFile);
-        }
-    }
 
     public static void deletePlayer(String nameToDelete) {
         java.io.File inputFile = new java.io.File("players.csv");
         java.io.File tempFile = new java.io.File("players_temp.csv");
 
+        boolean deleted = false;
         try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(inputFile));
              java.io.PrintWriter writer = new java.io.PrintWriter(new java.io.FileWriter(tempFile))) {
 
             String currentLine;
-            boolean deleted = false;
 
             while ((currentLine = reader.readLine()) != null) {
                 String[] data = currentLine.split(",");
-                if (data.length > 0 && data[0].equals(nameToDelete)) {
+                if (data.length > 0 && data[0].equals(nameToDelete.trim())) {
                     deleted = true;
                 } else {
                     writer.println(currentLine);
                 }
             }
 
-            if (deleted) {
-                System.out.println("Jugador eliminado con éxito.");
-            } else {
-                System.out.println("No se encontró el jugador para eliminar.");
-            }
 
         } catch (Exception e) {
-            System.out.println("Error al eliminar: " + e.getMessage());
+            System.out.println("Error al procesar el archivo: " + e.getMessage());
+            return;
         }
-
-        if (inputFile.delete()) {
-            tempFile.renameTo(inputFile);
+        if (deleted) {
+            try {
+                java.nio.file.Files.move(tempFile.toPath(), inputFile.toPath(),
+                        StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("Jugador eliminado con éxito.");}
+                catch (Exception e){
+                System.out.println("Error al actualizar el archivo: "+ e.getMessage());
+            }
+        } else {
+            tempFile.delete();
+            System.out.println("No sé encontró un jugador con ese nombre para eliminar");
         }
 
     }
@@ -159,23 +172,7 @@ public class Operation {
         return id;
     }
 
-    //Operaciones con Equipos
-    public static void createTeam(String teamName, String tecnicoName) {
-        int id = Equipo.generateTeamId();
 
-        // Estructura simple en CSV: ID, NombreEquipo, NombreTecnico
-        String teamData = id + "," + teamName + "," + tecnicoName + "\n";
-
-        File file = new File("teams.csv");
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-            writer.write(teamData);
-            System.out.println("¡Equipo registrado con éxito! ID asignado: " + id);
-        } catch (IOException e) {
-            System.out.println("Error al guardar el equipo: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
 
 
 

@@ -64,8 +64,9 @@ public class Main {
         do {
             System.out.println("\n*****MENÚ DE EQUIPOS*****");
             System.out.println("1. Crear Equipo");
-            System.out.println("2. Listar Equipos");
-            System.out.println("3. Actualizar Equipo");
+            System.out.println("2. Buscar Equipo");
+            System.out.println("3. Listar Equipos");
+            System.out.println("4. Actualizar Equipo");
             System.out.println("0. Volver al Menú Principal");
             System.out.print("Seleccione una opción: ");
             opcion = leer.nextInt();
@@ -73,8 +74,9 @@ public class Main {
 
             switch (opcion) {
                 case 1: newTeam(); break;
-                case 2: OperationEquipo.readTeams(); break;
-                case 3: updateTeam(); break;
+                case 2: searchTeam(); break;
+                case 3: OperationEquipo.readTeams(); break;
+                case 4: updateTeam(); break;
                 case 0: break;
                 default: System.out.println("Opción inválida.");
             }
@@ -135,7 +137,6 @@ public class Main {
         String name_player = leer.nextLine();
 
         Operation.deletePlayer(name_player);
-        System.out.println("Proceso de eliminación preparado.");
     }
 
     public static void newTeam() {
@@ -161,11 +162,18 @@ public class Main {
             OperationEquipo.saveTeam(name_team, name_tecnico, club_tecnico, jugadoresEquipo);
         }
     }
-
-    public static void updateTeam() {
+    public static void searchTeam() {
         Scanner leer = new Scanner(System.in);
-        System.out.println("Ingrese el nombre del equipo que desea actualizar:");
-        String oldName = leer.nextLine();
+        System.out.println("Ingrese el nombre o ID del equipo a buscar: ");
+        String searchTerm = leer.nextLine();
+
+        OperationEquipo.searchTeam(searchTerm);
+    }
+
+        public static void updateTeam () {
+            Scanner leer = new Scanner(System.in);
+            System.out.println("Ingrese el nombre del equipo que desea actualizar:");
+            String oldName = leer.nextLine();
         }
 
-}
+    }
