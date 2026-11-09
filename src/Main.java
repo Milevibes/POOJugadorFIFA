@@ -22,9 +22,11 @@ public class Main {
 
             switch (opcionPrincipal) {
                 case 1:
-                    menuJugadores(leer); break;
+                    menuJugadores(leer);
+                    break;
                 case 2:
-                    menuEquipos(leer); break;
+                    menuEquipos(leer);
+                    break;
                 case 0:
                     System.out.println("Hasta luego :)");
                     break;
@@ -33,6 +35,7 @@ public class Main {
             }
         } while (opcionPrincipal != 0);
     }
+
     public static void menuJugadores(Scanner leer) {
         int opcion;
         do {
@@ -48,13 +51,25 @@ public class Main {
             leer.nextLine();
 
             switch (opcion) {
-                case 1: newPlayer(); break;
-                case 2: findPlayer(); break;
-                case 3: showAllPlayers(); break;
-                case 4: updatePlayer(); break;
-                case 5: deletePlayer(); break;
-                case 0: break;
-                default: System.out.println("Opción inválida.");
+                case 1:
+                    newPlayer();
+                    break;
+                case 2:
+                    findPlayer();
+                    break;
+                case 3:
+                    showAllPlayers();
+                    break;
+                case 4:
+                    updatePlayer();
+                    break;
+                case 5:
+                    deletePlayer();
+                    break;
+                case 0:
+                    break;
+                default:
+                    System.out.println("Opción inválida.");
             }
         } while (opcion != 0);
     }
@@ -67,18 +82,36 @@ public class Main {
             System.out.println("2. Buscar Equipo");
             System.out.println("3. Listar Equipos");
             System.out.println("4. Actualizar Equipo");
+            System.out.println("5. Borrar Equipo");
+            System.out.println("6. Cambiar un jugador de Equipo");
             System.out.println("0. Volver al Menú Principal");
             System.out.print("Seleccione una opción: ");
             opcion = leer.nextInt();
             leer.nextLine();
 
             switch (opcion) {
-                case 1: newTeam(); break;
-                case 2: searchTeam(); break;
-                case 3: OperationEquipo.readTeams(); break;
-                case 4: updateTeam(); break;
-                case 0: break;
-                default: System.out.println("Opción inválida.");
+                case 1:
+                    newTeam();
+                    break;
+                case 2:
+                    searchTeam();
+                    break;
+                case 3:
+                    OperationEquipo.readTeams();
+                    break;
+                case 4:
+                    updateTeam();
+                    break;
+                case 5:
+                    deleteTeam();
+                    break;
+                case 6:
+                    transferPlayer();
+                    break;
+                case 0:
+                    break;
+                default:
+                    System.out.println("Opción inválida.");
             }
         } while (opcion != 0);
     }
@@ -110,6 +143,7 @@ public class Main {
         readPlayers();
 
     }
+
     public static void updatePlayer() {
         Scanner leer = new Scanner(System.in);
         System.out.println("Ingrese el nombre actual del jugador que desea actualizar:");
@@ -131,6 +165,7 @@ public class Main {
         Operation.updatePlayer(oldName, newName, year, month, day);
         System.out.println("Proceso de actualización preparado.");
     }
+
     public static void deletePlayer() {
         Scanner leer = new Scanner(System.in);
         System.out.println("Ingrese el nombre del jugador a eliminar:");
@@ -158,10 +193,11 @@ public class Main {
         for (int i = 0; i < totalJugadores; i++) {
             System.out.println("Ingrese el nombre o ID del jugador " + (i + 1) + ":");
             jugadoresEquipo[i] = leer.nextLine();
-
-            OperationEquipo.saveTeam(name_team, name_tecnico, club_tecnico, jugadoresEquipo);
         }
+
+        OperationEquipo.saveTeam(name_team, name_tecnico, club_tecnico, jugadoresEquipo);
     }
+
     public static void searchTeam() {
         Scanner leer = new Scanner(System.in);
         System.out.println("Ingrese el nombre o ID del equipo a buscar: ");
@@ -170,10 +206,25 @@ public class Main {
         OperationEquipo.searchTeam(searchTerm);
     }
 
-        public static void updateTeam () {
-            Scanner leer = new Scanner(System.in);
-            System.out.println("Ingrese el nombre del equipo que desea actualizar:");
-            String oldName = leer.nextLine();
-        }
-
+    public static void updateTeam() {
+        Scanner leer = new Scanner(System.in);
+        System.out.println("Ingrese el nombre o el ID del equipo que desea actualizar:");
+        String searchTermUpdate = leer.nextLine();
+        OperationEquipo.updateTeam(searchTermUpdate);
     }
+    public static void deleteTeam () {
+        Scanner leer = new Scanner(System.in);
+        System.out.println("Ingrese el nombre o ID del equipo que desea borrar:");
+        String searchTermDelete = leer.nextLine();
+        OperationEquipo.deleteTeam(searchTermDelete);
+
+        }
+    public static void transferPlayer () {
+        Scanner leer = new Scanner(System.in);
+        System.out.println("Ingrese el nombre o ID del jugador:");
+        String playerToMove = leer.nextLine();
+        System.out.println("Ingrese el nombre o ID del nuevo equipo destino:");
+        String targetTeam = leer.nextLine();
+        OperationEquipo.transferPlayer(playerToMove, targetTeam);
+    }
+}
