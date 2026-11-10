@@ -191,8 +191,21 @@ public class Main {
 
         String[] jugadoresEquipo = new String[totalJugadores];
         for (int i = 0; i < totalJugadores; i++) {
+            boolean jugadorValido = false;
+            while (!jugadorValido) {
             System.out.println("Ingrese el nombre o ID del jugador " + (i + 1) + ":");
-            jugadoresEquipo[i] = leer.nextLine();
+                String entrada = leer.nextLine();
+
+                String resultadoValidacion = OperationEquipo.verificarEstadoJugador(entrada, jugadoresEquipo);
+
+                if (resultadoValidacion.equals("OK")) {
+                    jugadoresEquipo[i] = entrada;
+                    jugadorValido = true;
+                    System.out.println("Jugador verificado y agregado.");
+                } else {
+                    System.out.println("Error: " + resultadoValidacion + " Ingrese otro ID/Nombre:");
+                }
+            }
         }
 
         OperationEquipo.saveTeam(name_team, name_tecnico, club_tecnico, jugadoresEquipo);

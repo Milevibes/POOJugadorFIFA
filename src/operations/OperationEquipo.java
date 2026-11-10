@@ -45,6 +45,69 @@ public class OperationEquipo {
             System.out.println("Aviso: No se recibieron jugadores para asociar a este equipo.");
         }
     }
+    public static String verificarEstadoJugador(String entrada, String[] jugadoresEquipoActual) {
+        if (entrada == null || entrada.trim().isEmpty()) {
+            return "La entrada no puede estar vacía.";
+        }
+
+        // 1. Verificar si ya fue ingresado previamente en este mismo registro de equipo actual
+        for (String jActual : jugadoresEquipoActual) {
+            if (jActual != null && jActual.trim().equalsIgnoreCase(entrada.trim())) {
+                return "Ya ingresaste a este jugador en la plantilla actual.";
+            }
+        }
+
+        File file = new File("players.csv");
+        if (!file.exists()) {
+            return "El archivo players.csv no existe.";
+        }
+
+        boolean jugadorEncontrado = false;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            int numeroDeLinea = 0;
+
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
+                numeroDeLinea++;
+
+                String[] data = line.split(",");
+                if (data.length >= 3) {
+                    String nombreJugador = data[0].trim();
+                    // Asumiendo que el ID/dorsal es la columna 1 o puedes adaptarlo según tu estructura
+                    String idDorsal = data[1].trim();
+
+                    // Comprobamos si coincide por ID o por Nombre
+                    boolean coincide = idDorsal.equalsIgnoreCase(entrada.trim()) ||
+                            nombreJugador.equalsIgnoreCase(entrada.trim());
+
+                    if (coincide) {
+                        jugadorEncontrado = true;
+
+                        // Verificamos si ya tiene equipo asignado
+                        // (Asumiendo que el ID del equipo está en la última columna, ej: data.length >= 5)
+                        boolean yaTieneEquipo = data.length >= 5 && !data[data.length - 1].trim().isEmpty();
+
+                        if (yaTieneEquipo) {
+                            return "El jugador " + nombreJugador + " ya pertenece a otro equipo. Use la opción de transferir.";
+                        }
+
+                        // Si pasó todas las validaciones del archivo, está OK
+                        return "OK";
+                    }
+                }
+            }
+        } catch (IOException e) {
+            return "Error al leer el archivo: " + e.getMessage();
+        }
+
+        if (!jugadorEncontrado) {
+            return "El jugador '" + entrada + "' no existe.";
+        }
+
+        return "OK";
+    }
 
     private static void updateJugadoresConEquipo(String[] nombresJugadores, int idEquipo) {
         File inputFile = new File("players.csv");
@@ -84,7 +147,6 @@ public class OperationEquipo {
                                     break;
                                 }
                             } catch (NumberFormatException e) {
-                                // Si por error ingresaron un nombre en lugar de un número, también lo comparamos por nombre
                                 if (entrada.trim().equalsIgnoreCase(nombreJugador)) {
                                     estaSeleccionado = true;
                                     break;
@@ -168,8 +230,10 @@ public class OperationEquipo {
 
             while ((line = reader.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
+
                 String[] parts = line.split(",");
                 if (parts.length >= 4) {
+                    hayEquipos = true;
                     String teamId = parts[0].trim();
                     String teamName = parts[1].trim();
                     String tecnicoName = parts[2].trim();
@@ -185,6 +249,7 @@ public class OperationEquipo {
             if (!hayEquipos) {
                 System.out.println("No hay equipos registrados todavía.");
             }
+
         } catch (IOException e) {
             System.out.println("Error al leer los equipos: " + e.getMessage());
         }
@@ -205,6 +270,8 @@ public class OperationEquipo {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
+
                 String[] parts = line.split(",");
                 if (parts.length >= 4) {
                     String teamId = parts[0].trim();
@@ -225,15 +292,13 @@ public class OperationEquipo {
                         break;
                     }
                 }
-
-
-                if (!encontrado) {
-                    System.out.println("No se encontró ningún equipo con el nombre o ID: " + searchTerm);
-                }
             }
 
         } catch (IOException e) {
             System.out.println("Error al buscar el equipo: " + e.getMessage());
+        }
+        if (!encontrado) {
+            System.out.println("No se encontró ningún equipo con el nombre o ID: " + searchTerm);
         }
     }
     public static void updateTeam(String searchTerm) {
@@ -329,7 +394,6 @@ public class OperationEquipo {
         if (inputFile.exists()) inputFile.delete();
         tempFile.renameTo(inputFile);
 
-        // Si se borró el equipo, removemos la asociación de sus jugadores en players.csv
         if (borrado && !idEquipoBorrado.isEmpty()) {
             liberarJugadoresDeEquipo(idEquipoBorrado);
         } else {
