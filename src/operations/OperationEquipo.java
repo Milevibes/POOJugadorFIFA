@@ -50,7 +50,6 @@ public class OperationEquipo {
             return "La entrada no puede estar vacía.";
         }
 
-        // 1. Verificar si ya fue ingresado previamente en este mismo registro de equipo actual
         for (String jActual : jugadoresEquipoActual) {
             if (jActual != null && jActual.trim().equalsIgnoreCase(entrada.trim())) {
                 return "Ya ingresaste a este jugador en la plantilla actual.";
@@ -75,25 +74,24 @@ public class OperationEquipo {
                 String[] data = line.split(",");
                 if (data.length >= 3) {
                     String nombreJugador = data[0].trim();
-                    // Asumiendo que el ID/dorsal es la columna 1 o puedes adaptarlo según tu estructura
-                    String idDorsal = data[1].trim();
-
-                    // Comprobamos si coincide por ID o por Nombre
-                    boolean coincide = idDorsal.equalsIgnoreCase(entrada.trim()) ||
-                            nombreJugador.equalsIgnoreCase(entrada.trim());
+                    boolean coincide = false;
+                    try {
+                        coincide = Integer.parseInt(entrada.trim()) == numeroDeLinea;
+                    } catch (NumberFormatException e) {
+                    }
+                    if (!coincide) {
+                        coincide = nombreJugador.equalsIgnoreCase(entrada.trim());
+                    }
 
                     if (coincide) {
                         jugadorEncontrado = true;
 
-                        // Verificamos si ya tiene equipo asignado
-                        // (Asumiendo que el ID del equipo está en la última columna, ej: data.length >= 5)
                         boolean yaTieneEquipo = data.length >= 5 && !data[data.length - 1].trim().isEmpty();
 
                         if (yaTieneEquipo) {
                             return "El jugador " + nombreJugador + " ya pertenece a otro equipo. Use la opción de transferir.";
                         }
 
-                        // Si pasó todas las validaciones del archivo, está OK
                         return "OK";
                     }
                 }
@@ -494,7 +492,7 @@ public class OperationEquipo {
 
                         if (coincide) {
                             writer.println(nombre + "," + data[1].trim() + "," + data[2].trim() + "," + data[3].trim() + "," + nuevoTeamId);
-                            System.out.println("--> ¡Jugador " + nombre + " transferido al equipo ID " + nuevoTeamId + " con éxito!");
+                            System.out.println("Jugador " + nombre + " transferido al equipo ID " + nuevoTeamId + " con éxito!");
                             transferido = true;
                         } else {
                             writer.println(line);
@@ -514,6 +512,70 @@ public class OperationEquipo {
                 System.out.println("No se encontró ningún jugador con el nombre o ID: " + playerIdentifier);
             }
         }
+    private static String buscarIdEquipo(String searchTerm) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) return null;
+
+        File file = new File("teams.csv");
+        if (!file.exists()) return null;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
+                String[] parts = line.split(",");
+                if (parts.length >= 2) {
+                    String teamId = parts[0].trim();
+                    String teamName = parts[1].trim();
+
+                    if (teamId.equalsIgnoreCase(searchTerm.trim()) || teamName.equalsIgnoreCase(searchTerm.trim())) {
+                        return teamId;
+                    }
+                }
+            }
+        } catch (IOException e) {
+        }
+        return null;
+    }
+    public static void agregarJugadoresAEquipo() {
+        Scanner leer = new Scanner(System.in);
+        System.out.println("Ingrese el nombre o ID del equipo al que desea agregar jugadores:");
+        String searchTerm = leer.nextLine();
+
+        String equipoIdStr = buscarIdEquipo(searchTerm);
+        if (equipoIdStr == null) {
+            System.out.println("Error: No se encontró ningún equipo con ese nombre o ID.");
+            return;
+        }
+
+        int idEquipo = Integer.parseInt(equipoIdStr);
+
+        System.out.println("¿Cuántos jugadores desea agregar a este equipo?");
+        int totalNuevos = leer.nextInt();
+        leer.nextLine();
+
+        String[] nuevosJugadores = new String[totalNuevos];
+
+        for (int i = 0; i < totalNuevos; i++) {
+            boolean jugadorValido = false;
+            while (!jugadorValido) {
+                System.out.println("Ingrese el nombre o ID del jugador " + (i + 1) + ":");
+                String entrada = leer.nextLine();
+
+                String resultado = verificarEstadoJugador(entrada, nuevosJugadores);
+
+                if (resultado.equals("OK")) {
+                    nuevosJugadores[i] = entrada;
+                    jugadorValido = true;
+                    System.out.println("Jugador verificado y agregado al equipo.");
+                } else {
+                    System.out.println("Error: " + resultado);
+                }
+            }
+        }
+
+        updateJugadoresConEquipo(nuevosJugadores, idEquipo);
+        System.out.println("¡Los jugadores han sido vinculados con éxito al equipo!");
+    }
     }
 
 

@@ -84,6 +84,7 @@ public class Main {
             System.out.println("4. Actualizar Equipo");
             System.out.println("5. Borrar Equipo");
             System.out.println("6. Cambiar un jugador de Equipo");
+            System.out.println("7. Agregar jugadores a un Equipo existente");
             System.out.println("0. Volver al Menú Principal");
             System.out.print("Seleccione una opción: ");
             opcion = leer.nextInt();
@@ -107,6 +108,9 @@ public class Main {
                     break;
                 case 6:
                     transferPlayer();
+                    break;
+                case 7:
+                    OperationEquipo.agregarJugadoresAEquipo();
                     break;
                 case 0:
                     break;
